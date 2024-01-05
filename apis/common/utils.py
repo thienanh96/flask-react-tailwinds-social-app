@@ -1,8 +1,4 @@
 from flask_restx import fields, Namespace, Model
-from flask import current_app
-from werkzeug.exceptions import InternalServerError
-from flask_pymongo.wrappers import Database
-from flask_pymongo import PyMongo
 
 
 def get_paginated_data(api: Namespace, entity: Namespace, prefix: str | None) -> Model:
@@ -19,11 +15,3 @@ def get_request_filters_with_pagination(api: Namespace, prefix: str, model: Mode
         'skip': fields.Integer(default=0),
         'limit': fields.Integer(default=10)
     })
-
-
-def get_db() -> Database:
-    db = PyMongo(current_app).db
-    if db is None:
-        raise InternalServerError('Database is not initialized')
-
-    return db

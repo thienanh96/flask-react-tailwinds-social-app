@@ -3,8 +3,8 @@ import { OverlayPanel } from "primereact/overlaypanel"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { logoutUser, selectAuth } from "../../features/auth/authSlice"
 import { Dialog } from "primereact/dialog"
-import LoginForm from "./LoginForm"
-import RegisterForm from "./RegisterForm"
+import LoginForm from "../../features/auth/LoginForm"
+import RegisterForm from "../../features/auth/RegisterForm"
 import Avatar from "react-avatar"
 import { getCurrentUser } from "../../features/auth/authActions"
 
@@ -27,7 +27,7 @@ export const NavBar = () => {
   }, [auth?.success])
 
   return (
-    <nav className="bg-gray-800">
+    <nav className="bg-white">
       <div className="mx-auto max-w-7xl px-2 sm:px-6 lg:px-8">
         <div className="relative flex h-16 items-center justify-between">
           <div className="absolute inset-y-0 left-0 flex items-center sm:hidden">
@@ -74,20 +74,9 @@ export const NavBar = () => {
             <div className="flex flex-shrink-0 items-center">
               <img
                 className="h-8 w-auto"
-                src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                alt="Your Company"
+                src="https://www.redditinc.com/assets/images/site/Reddit_Lockup_Logo.svg"
+                alt="Reddit"
               />
-            </div>
-            <div className="hidden sm:ml-6 sm:block">
-              <div className="flex space-x-4">
-                <a
-                  href="#"
-                  className="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
-                  aria-current="page"
-                >
-                  Dashboard
-                </a>
-              </div>
             </div>
           </div>
           <div className="inset-y-0 right-0 flex items-center pr-2 sm:static sm:inset-auto sm:ml-6 sm:pr-0">
@@ -133,7 +122,7 @@ export const NavBar = () => {
             ) : (
               <button
                 type="button"
-                className="bg-gray-900 text-white rounded-md px-3 py-2 text-sm font-medium"
+                className="bg-[#DAE0E6] text-black rounded-md px-3 py-2 text-sm font-medium"
                 onClick={() => setOpenDialog("login")}
               >
                 Login

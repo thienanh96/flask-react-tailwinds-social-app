@@ -3,6 +3,7 @@ from flask_restx._http import HTTPStatus
 from modules.users.users_service import UserService
 from common.decorators import login_required
 from flask import g
+from dependency_injector.wiring import Provide
 
 
 ns = Namespace('users')
@@ -21,8 +22,9 @@ login_register_user_request_model = ns.model('LoginUserModel', {
 
 @ns.route('/register')
 class RegisterUserRoute(Resource):
+    user_service: UserService = Provide['user_service']
+
     def __init__(self, api=None, *args, **kwargs):
-        self.user_service = UserService()
         super().__init__(api, *args, **kwargs)
 
     '''Register new user'''
@@ -35,8 +37,9 @@ class RegisterUserRoute(Resource):
 
 @ns.route('/login')
 class LoginUserRoute(Resource):
+    user_service: UserService = Provide['user_service']
+
     def __init__(self, api=None, *args, **kwargs):
-        self.user_service = UserService()
         super().__init__(api, *args, **kwargs)
 
     '''Login user'''
@@ -49,8 +52,9 @@ class LoginUserRoute(Resource):
 
 @ns.route('/current')
 class CurrentUserRoute(Resource):
+    user_service: UserService = Provide['user_service']
+
     def __init__(self, api=None, *args, **kwargs):
-        self.user_service = UserService()
         super().__init__(api, *args, **kwargs)
 
     '''Get current user'''
