@@ -8,10 +8,12 @@ from werkzeug.middleware.proxy_fix import ProxyFix
 from modules.users.users_controller import ns as userNs
 from modules.posts.posts_controller import ns as postNs
 from modules.posts.likes.likes_controller import ns as postLikeNs
+from modules.posts.comments.comments_controller import ns as postCommentNs
 from flask_cors import CORS
 from modules.users.users_container import UserContainer
 from modules.posts.posts_container import PostContainer
 from modules.posts.likes.likes_container import PostLikeContainer
+from modules.posts.comments.comments_container import PostCommentContainer
 
 
 def connect_db(app: Flask):
@@ -26,23 +28,25 @@ def parse_config(app: Flask):
 
 def add_namespaces(api: Api):
     api.add_namespace(userNs, '/users')
+    api.add_namespace(postCommentNs, '/posts/<id>/comments')
     api.add_namespace(postLikeNs, '/posts/likes')
     api.add_namespace(postNs, '/posts')
 
 
 def wire_modules():
     UserContainer().wire(modules=[
-        "modules.posts.posts_service", "modules.users.users_controller", "common.decorators", "modules.posts.posts_controller", "modules.posts.likes.likes_controller"])
+        "modules.posts.posts_service", "modules.users.users_controller", "common.decorators", "modules.posts.posts_controller", "modules.posts.likes.likes_controller", "modules.posts.comments.comments_controller"])
     PostContainer().wire(
         modules=['modules.posts.posts_controller', 'modules.posts.likes.likes_service'])
     PostLikeContainer().wire(
         modules=['modules.posts.likes.likes_controller', 'modules.posts.posts_service'])
+    PostCommentContainer().wire(modules=['modules.posts.comments.comments_controller', 'modules.posts.posts_service'])
 
 
 if __name__ == '__main__':
     app = Flask(__name__)
     app.wsgi_app = ProxyFix(app.wsgi_app)
-    cors = CORS(app, origins=['http://localhost:5173'])
+    cors = CORS(app, origins=['http://127.0.0.1:5173', 'http://localhost:5173'])
     parse_config(app=app)
 
     with app.app_context():

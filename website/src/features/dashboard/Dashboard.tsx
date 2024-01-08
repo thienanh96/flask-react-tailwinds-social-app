@@ -2,16 +2,14 @@ import { Button } from "primereact/button"
 import { Dialog } from "primereact/dialog"
 import { Editor } from "primereact/editor"
 import React, { useEffect, useRef, useState } from "react"
-import { ELikeType, createLike, createPost, getPosts } from "./post/postActions"
+import { createPost, getPosts } from "./post/postActions"
 import { useAppDispatch, useAppSelector } from "../../app/hooks"
 import { selectAuth } from "../auth/authSlice"
 import { Message } from "primereact/message"
 import { InputText } from "primereact/inputtext"
 import { Form, Formik, FormikProps } from "formik"
 import { selectPost } from "./post/postSlice"
-import parse from "html-react-parser"
-import DOMPurify from "isomorphic-dompurify"
-import dayjs from "dayjs"
+import CardPost from "./post/CardPost"
 
 interface DashboardProps {}
 
@@ -133,63 +131,7 @@ export default function Dashboard(props: DashboardProps) {
         </Dialog>
       </div>
       {postData.posts.map((post) => {
-        return (
-          <div className="w-full bg-white mt-3 p-5">
-            <div className="flex justify-between">
-              <p className="text-blue-600 font-semibold">{post.authorName}</p>
-            </div>
-            <div className="flex justify-between">
-              <div className="mt-7 text-left w-11/12">
-                {" "}
-                <h1 className="mb-10 text-2xl font-semibold">{post.title}</h1>
-                <div className="max-h-96 overflow-auto">
-                  {parse(DOMPurify.sanitize(post.content))}
-                </div>
-              </div>
-              <div className="ml-5">
-                <div className="mb-5">
-                  {" "}
-                  <i
-                    className={`pi pi-arrow-up cursor-pointer ${
-                      post.likedByMe ? "text-orange-600" : ""
-                    }`}
-                    style={{ fontWeight: 800 }}
-                    onClick={() => {
-                      dispatch(
-                        createLike({
-                          postId: post.id,
-                          type: ELikeType.LIKE,
-                        }),
-                      )
-                    }}
-                  ></i>
-                </div>
-                <div className="mb-5 font-semibold">
-                  {post.likeCount - post.dislikeCount}
-                </div>
-                <div>
-                  <i
-                    className={`pi pi-arrow-down cursor-pointer ${
-                      post.dislikedByMe ? "text-blue-600" : ""
-                    }`}
-                    style={{ fontWeight: 800 }}
-                    onClick={() => {
-                      dispatch(
-                        createLike({
-                          postId: post.id,
-                          type: ELikeType.DISLIKE,
-                        }),
-                      )
-                    }}
-                  ></i>
-                </div>
-              </div>
-            </div>
-            <div className="flex justify-flex-start mt-8 text-zinc-400">
-              <div>{dayjs(post.createdAt).format("MMM DD, YYYY hh:mm a")}</div>
-            </div>
-          </div>
-        )
+        return <CardPost post={post} />
       })}
     </div>
   )

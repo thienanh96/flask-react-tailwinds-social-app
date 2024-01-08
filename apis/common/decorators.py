@@ -9,13 +9,11 @@ from modules.users.users_container import UserContainer
 def login_required(f):
     @wraps(f)
     @inject
-    def decorated_function(*args, user_service: UserService = Provide[UserContainer.user_service]):
+    def decorated_function(*args, user_service: UserService = Provide[UserContainer.user_service], **kwargs):
         try:
             g.user = user_service.get_logged_in_user_info(
                 request.headers.get('Token'))
-            print(g.user)
         except Exception as e:
-            print(e)
             raise Unauthorized()
 
         return f(*args)

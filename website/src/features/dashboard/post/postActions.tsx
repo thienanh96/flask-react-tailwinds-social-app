@@ -2,7 +2,7 @@ import axios from "axios"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import { toSnakeCase } from "../../../common/utils"
 
-const apiUrl = "http://localhost:5000"
+const apiUrl = "http://127.0.0.1:5000"
 
 export interface IPost {
   id: string
@@ -14,6 +14,7 @@ export interface IPost {
   createdAt: Date
   likedByMe?: boolean
   dislikedByMe?: boolean
+  comments: Array<IComment>
 }
 
 export enum ELikeType {
@@ -26,7 +27,13 @@ export interface ILike {
   type: ELikeType
 }
 
-export interface IPaginatedPostResponses {}
+export interface IComment {
+  postId: string
+  username?: string
+  parentId?: string
+  content: string
+  comments?: Array<IComment>
+}
 
 export const createPost = createAsyncThunk<
   any,
@@ -95,3 +102,71 @@ export const createLike = createAsyncThunk<any, ILike>(
     }
   },
 )
+
+export const deleteLike = createAsyncThunk<any, ILike>(
+  "like/delete",
+  async (data, { rejectWithValue }) => {
+    try {
+      await axios.delete(`${apiUrl}/posts/likes`, {
+        data: toSnakeCase(data),
+        headers: {
+          token: localStorage.getItem("token"),
+        },
+      })
+
+      return data
+    } catch (error: any) {
+      if (error.response && error.response.data.message) {
+        return rejectWithValue(error.response.data.message)
+      } else {
+        return rejectWithValue(error.message)
+      }
+    }
+  },
+)
+
+export const createComment = createAsyncThunk<any, IComment>(
+  "comment/create",
+  async (data, { rejectWithValue }) => {
+    try {
+      await axios.post(`${apiUrl}/posts/comments`, toSnakeCase(data), {
+        headers: {
+          "Content-Type": "application/json",
+          token: localStorage.getItem("token"),
+        },
+      })
+
+      return data
+    } catch (error: any) {
+      if (error.response && error.response.data.message) {
+        return rejectWithValue(error.response.data.message)
+      } else {
+        return rejectWithValue(error.message)
+      }
+    }
+  },
+)
+
+export const getComments = createAsyncThunk<
+  any,
+  Pick<IComment, "postId" | "parentId">
+>("comment/getList", async (data, { rejectWithValue }) => {
+  try {
+    await axios.get(`${apiUrl}/posts/${data.postId}/comments`, {
+      data: {
+        parentId: data.parentId,
+      },
+      headers: {
+        token: localStorage.getItem("token"),
+      },
+    })
+
+    return data
+  } catch (error: any) {
+    if (error.response && error.response.data.message) {
+      return rejectWithValue(error.response.data.message)
+    } else {
+      return rejectWithValue(error.message)
+    }
+  }
+})

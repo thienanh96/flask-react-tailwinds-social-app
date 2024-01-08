@@ -1,7 +1,7 @@
 import axios from "axios"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 
-const backendURL = "http://localhost:5000"
+const backendURL = "http://127.0.0.1:5000"
 
 export interface IAuthUser {
   id: string

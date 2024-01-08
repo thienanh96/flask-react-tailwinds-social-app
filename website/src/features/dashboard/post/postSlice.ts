@@ -5,6 +5,7 @@ import {
   IPost,
   createLike,
   createPost,
+  deleteLike,
   getPosts,
 } from "./postActions"
 import { RootState } from "../../../app/store"
@@ -55,6 +56,18 @@ const postSlice = createSlice({
             post.dislikeCount++
             post.dislikedByMe = true
             post.likedByMe = false
+          }
+        }
+      })
+      .addCase(deleteLike.fulfilled, (state, action: PayloadAction<ILike>) => {
+        const post = state.posts.find((p) => p.id === action.payload.postId)
+        if (post) {
+          if (action.payload.type === ELikeType.LIKE) {
+            post.likeCount--
+            post.likedByMe = false
+          } else if (action.payload.type === ELikeType.DISLIKE) {
+            post.dislikeCount--
+            post.dislikedByMe = false
           }
         }
       })

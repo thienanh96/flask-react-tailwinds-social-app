@@ -27,12 +27,12 @@ class PostLikeRoute(Resource):
     @ns.expect(post_like_request_model, validate=True)
     @login_required
     def post(self):
-        print('--ss--')
         return self.post_like_service.create_like(ns.payload)
 
     '''delete like'''
-    @ns.doc('create_post_like')
+    @ns.doc('delete_post_like')
     @ns.expect(post_like_request_model, validate=True)
     @login_required
     def delete(self):
+        print('---ddd', ns.payload)
         return self.post_like_service.delete_like(ns.payload)

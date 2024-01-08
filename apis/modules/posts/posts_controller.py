@@ -1,6 +1,7 @@
 from flask_restx import Resource, fields, Namespace
 from dependency_injector.wiring import Provide
 from common.decorators import login_required
+from modules.posts.comments.comments_controller import post_comment_request_model
 
 
 ns = Namespace('posts')
@@ -15,6 +16,7 @@ post_model = ns.model('PostModel', {
     'createdAt': fields.DateTime(required=True, description='The creation datetime of post', attribute='created_at'),
     'likedByMe': fields.Boolean(required=True, attribute='liked_by_me'),
     'dislikedByMe': fields.Boolean(required=True, attribute='disliked_by_me'),
+    'comments': fields.List(fields.Nested(allow_null=True, model=post_comment_request_model))
 })
 
 
