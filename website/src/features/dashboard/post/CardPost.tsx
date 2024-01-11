@@ -4,6 +4,7 @@ import DOMPurify from "isomorphic-dompurify"
 import dayjs from "dayjs"
 import {
   ELikeType,
+  IComment,
   IPost,
   createComment,
   createLike,
@@ -20,26 +21,8 @@ interface CardPostProps {
   post: IPost
 }
 
-const comments = [
-  {
-    content: "Content 1",
-    username: "User 1",
-  },
-  {
-    content: "Content 2",
-    username: "User 2",
-  },
-  {
-    content: "Content 3",
-    username: "User 3",
-  },
-  {
-    content: "Content 4",
-    username: "User 4",
-  },
-]
-
 export default function CardPost({ post }: CardPostProps) {
+  console.log("🚀 ~ file: CardPost.tsx:25 ~ CardPost ~ post:", post)
   const dispatch = useAppDispatch()
 
   return (
@@ -115,21 +98,22 @@ export default function CardPost({ post }: CardPostProps) {
       <div className="flex justify-flex-start mt-8 text-zinc-400">
         <div>{dayjs(post.createdAt).format("MMM DD, YYYY hh:mm a")}</div>
       </div>
-      <InputComment postId={post.id} />
+      <InputComment postId={post.id} comments={post.comments} />
     </div>
   )
 }
 
 interface InputCommentProps {
   postId: string
-  parentComment?: {
-    parentId: string
-    content: string
-    username: string
-  }
+  comments?: Array<IComment>
+  parentComment?: IComment
 }
 
-const InputComment = ({ postId, parentComment }: InputCommentProps) => {
+const InputComment = ({
+  postId,
+  parentComment,
+  comments,
+}: InputCommentProps) => {
   const auth = useAppSelector(selectAuth)
   const dispatch = useAppDispatch()
 
@@ -142,7 +126,7 @@ const InputComment = ({ postId, parentComment }: InputCommentProps) => {
       dispatch(
         getComments({
           postId,
-          parentId: parentComment?.parentId,
+          parentId: parentComment?.id,
         }),
       )
     }
@@ -151,26 +135,35 @@ const InputComment = ({ postId, parentComment }: InputCommentProps) => {
   return (
     <div>
       {parentComment && (
-        <>
-          <div className="flex justify-flex-start mt-5 gap-3">
-            <Avatar
-              size={"45px"}
-              textSizeRatio={2}
-              round
-              name={parentComment.username}
-            />
-            <div className="mt-3">{parentComment.content}</div>
-          </div>
-        </>
+        <div className={`flex justify-flex-start mt-5 gap-3`}>
+          <Avatar
+            size={"45px"}
+            textSizeRatio={2}
+            round
+            name={auth?.userInfo?.username}
+          />
+          <div>{parentComment?.content}</div>
+        </div>
       )}
-      <div
-        className={`flex justify-flex-start mt-5 gap-3 ${
-          parentComment ? "ml-16" : ""
-        }`}
-      >
+      <div>
         {showInput ? (
           <>
-            <div>
+            {comments && comments.length > 0 && (
+              <>
+                {comments.map((c) => (
+                  <InputComment
+                    postId={postId}
+                    parentComment={c}
+                    comments={c?.comments}
+                  />
+                ))}
+              </>
+            )}
+            <div
+              className={`flex justify-flex-start mt-5 gap-3 ${
+                parentComment ? "ml-16" : ""
+              }`}
+            >
               <Avatar
                 size={"45px"}
                 textSizeRatio={2}
@@ -190,7 +183,7 @@ const InputComment = ({ postId, parentComment }: InputCommentProps) => {
                   dispatch(
                     createComment({
                       postId,
-                      parentId: parentComment?.parentId,
+                      parentId: parentComment?.id,
                       content: currentComment,
                     }),
                   )
@@ -204,11 +197,17 @@ const InputComment = ({ postId, parentComment }: InputCommentProps) => {
         ) : (
           <>
             <div
-              className="cursor-pointer"
-              onClick={() => setShowInput(!showInput)}
+              className={`flex justify-flex-start -mt-2 gap-3 ${
+                parentComment ? "ml-16" : ""
+              }`}
             >
-              <i className="pi pi-comment mr-2 mt-2"></i>
-              <span>See replies</span>
+              <div
+                className="cursor-pointer"
+                onClick={() => setShowInput(!showInput)}
+              >
+                <i className="pi pi-comment mr-2 mt-2"></i>
+                <span>See replies</span>
+              </div>
             </div>
           </>
         )}

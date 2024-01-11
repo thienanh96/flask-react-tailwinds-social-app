@@ -24,13 +24,13 @@ class PostService:
 
         post_dao: PostDAO = self.post_schema_cls.objects(
             id=new_post.id).first()
-        
+
         return self.get_posts_dto(posts_dao=[post_dao])[0]
 
     def get_posts(self) -> List[PostDAO]:
         db_posts: List[PostDAO] = self.post_schema_cls.objects().order_by(
             '-created_at')
-        
+
         return self.get_posts_dto(posts_dao=db_posts)
 
     def get_posts_dto(self, posts_dao: List[PostDAO]):
@@ -53,7 +53,7 @@ class PostService:
             post['created_at'] = db_post.created_at
             post['liked_by_me'] = is_like_or_dislike_by_me[idx]['is_liked_by_me']
             post['disliked_by_me'] = is_like_or_dislike_by_me[idx]['is_disliked_by_me']
-            post['comments'] = [] # not loaded with list posts
+            post['comments'] = []  # not loaded with list posts
             posts.append(post)
 
         return posts
@@ -61,7 +61,7 @@ class PostService:
     def get_post_by_id(self, post_id: ObjectId) -> PostDAO:
         return self.post_schema_cls.objects(id=post_id).first()
 
-    def update_post_likes(self, post_id: ObjectId, like_count: int or None, dislike_count: int or None):
+    def update_post_likes(self, post_id: ObjectId, like_count: int | None, dislike_count: int | None):
         posts = self.post_schema_cls.objects(id=post_id)
         if len(posts) > 0:
             if like_count is not None:

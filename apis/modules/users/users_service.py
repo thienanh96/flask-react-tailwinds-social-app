@@ -14,7 +14,7 @@ class UserService:
         new_user = self.user_schema_cls()
         new_user.username = payload['username']
 
-        existing_user: UserDAO or None = self.user_schema_cls.objects(
+        existing_user: UserDAO | None = self.user_schema_cls.objects(
             username=payload['username']).first()
 
         if existing_user is not None:
@@ -41,7 +41,7 @@ class UserService:
     def login(self, payload):
         username = payload['username']
         password = payload['password']
-        existing_user: UserDAO or None = self.user_schema_cls.objects(
+        existing_user: UserDAO | None = self.user_schema_cls.objects(
             username=username).first()
         if existing_user is None:
             raise BadRequest('User not found')
@@ -58,7 +58,7 @@ class UserService:
             'token': self.get_user_token(user=existing_user)
         }
 
-    def get_logged_in_user_info(self, token: str or None):
+    def get_logged_in_user_info(self, token: str | None):
         if token is None:
             raise Unauthorized('Token does not exist')
         return jwt.decode(token, 'secret', ["HS256"])

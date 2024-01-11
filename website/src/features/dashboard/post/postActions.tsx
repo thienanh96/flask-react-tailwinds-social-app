@@ -1,6 +1,7 @@
 import axios from "axios"
 import { createAsyncThunk } from "@reduxjs/toolkit"
 import { toSnakeCase } from "../../../common/utils"
+import { omit } from "lodash"
 
 const apiUrl = "http://127.0.0.1:5000"
 
@@ -28,10 +29,12 @@ export interface ILike {
 }
 
 export interface IComment {
+  id: string
   postId: string
   username?: string
   parentId?: string
   content: string
+  createdAt: Date
   comments?: Array<IComment>
 }
 
@@ -125,43 +128,50 @@ export const deleteLike = createAsyncThunk<any, ILike>(
   },
 )
 
-export const createComment = createAsyncThunk<any, IComment>(
-  "comment/create",
-  async (data, { rejectWithValue }) => {
-    try {
-      await axios.post(`${apiUrl}/posts/comments`, toSnakeCase(data), {
+export const createComment = createAsyncThunk<
+  any,
+  Omit<IComment, "id" | "createdAt">
+>("comment/create", async (data, { rejectWithValue }) => {
+  try {
+    await axios.post(
+      `${apiUrl}/posts/${data.postId}/comments`,
+      omit(toSnakeCase(data), ["post_id"]),
+      {
         headers: {
           "Content-Type": "application/json",
           token: localStorage.getItem("token"),
         },
-      })
+      },
+    )
 
-      return data
-    } catch (error: any) {
-      if (error.response && error.response.data.message) {
-        return rejectWithValue(error.response.data.message)
-      } else {
-        return rejectWithValue(error.message)
-      }
+    return data
+  } catch (error: any) {
+    if (error.response && error.response.data.message) {
+      return rejectWithValue(error.response.data.message)
+    } else {
+      return rejectWithValue(error.message)
     }
-  },
-)
+  }
+})
 
 export const getComments = createAsyncThunk<
   any,
   Pick<IComment, "postId" | "parentId">
 >("comment/getList", async (data, { rejectWithValue }) => {
   try {
-    await axios.get(`${apiUrl}/posts/${data.postId}/comments`, {
-      data: {
-        parentId: data.parentId,
+    const response = await axios.get(
+      `${apiUrl}/posts/${data.postId}/comments`,
+      {
+        params: {
+          parentId: data.parentId,
+        },
+        headers: {
+          token: localStorage.getItem("token"),
+        },
       },
-      headers: {
-        token: localStorage.getItem("token"),
-      },
-    })
+    )
 
-    return data
+    return response.data
   } catch (error: any) {
     if (error.response && error.response.data.message) {
       return rejectWithValue(error.response.data.message)
